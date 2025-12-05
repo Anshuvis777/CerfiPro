@@ -6,8 +6,10 @@ Spring Boot backend for the CertifyPro Digital Certificate Verification Platform
 
 - 🔐 JWT-based authentication with role-based access control
 - 📜 Certificate issuance and management
+- 📩 Certificate request workflow (Request, Approve, Reject)
 - ✅ Blockchain-based certificate verification
-- 🔍 QR code generation for certificates
+- 🔍 QR code generation with unique Verification IDs
+- ☁️ AWS S3 integration for profile picture storage
 - 👥 Multi-role support (Individual, Issuer, Employer, Admin)
 - 📊 RESTful API with comprehensive endpoints
 - 🛡️ Spring Security integration
@@ -23,6 +25,7 @@ Spring Boot backend for the CertifyPro Digital Certificate Verification Platform
 - **PostgreSQL** (production) / **H2** (development)
 - **Lombok** for boilerplate reduction
 - **MapStruct** for DTO mapping
+- **AWS SDK for Java** (S3)
 - **ZXing** for QR code generation
 - **Swagger/OpenAPI** for API documentation
 
@@ -103,12 +106,24 @@ When running in development mode, the following test users are created:
 - `DELETE /api/certificates/{id}/revoke` - Revoke certificate (ISSUER only)
 
 ### Verification
-- `POST /api/verify` - Verify certificate by ID
-- `GET /api/verify/{certificateId}` - Verify certificate by ID
+- `GET /api/certificates/verify/{verificationId}` - Public verification by ID (No auth required)
+- `POST /api/verify` - Verify certificate by UUID
+- `GET /api/verify/{certificateId}` - Verify certificate by UUID
+
+### Certificate Requests
+- `POST /api/requests` - Create a new certificate request
+- `GET /api/requests/my-requests` - Get current user's requests
+- `GET /api/requests/pending` - Get pending requests (ISSUER only)
+- `GET /api/requests/issuer` - Get all requests for issuer
+- `PUT /api/requests/{id}/approve` - Approve request (ISSUER only)
+- `PUT /api/requests/{id}/reject` - Reject request (ISSUER only)
 
 ### Users
 - `GET /api/users/profile` - Get current user profile
 - `GET /api/users/{username}` - Get user profile by username
+- `PUT /api/users/profile` - Update user profile
+- `POST /api/users/profile/picture` - Upload profile picture (S3)
+- `DELETE /api/users/profile/picture` - Delete profile picture
 
 ## API Documentation
 
@@ -135,6 +150,7 @@ src/main/java/com/certifypro/
 ├── controller/          # REST Controllers
 │   ├── AuthController.java
 │   ├── CertificateController.java
+│   ├── CertificateRequestController.java
 │   ├── UserController.java
 │   └── VerificationController.java
 ├── dto/                 # Data Transfer Objects
@@ -143,6 +159,7 @@ src/main/java/com/certifypro/
 ├── entity/              # JPA Entities
 │   ├── User.java
 │   ├── Certificate.java
+│   ├── CertificateRequest.java
 │   ├── Skill.java
 │   └── Notification.java
 ├── exception/           # Exception Handling
@@ -154,7 +171,9 @@ src/main/java/com/certifypro/
 │   └── CustomUserDetailsService.java
 ├── service/             # Business Logic
 │   ├── AuthService.java
-│   └── CertificateService.java
+│   ├── CertificateService.java
+│   ├── CertificateRequestService.java
+│   └── QRCodeService.java
 └── util/                # Utility Classes
     ├── QRCodeGenerator.java
     └── BlockchainUtil.java
@@ -168,6 +187,13 @@ For production, set these environment variables:
 JWT_SECRET=your-secret-key-here
 MAIL_USERNAME=your-email@gmail.com
 MAIL_PASSWORD=your-app-password
+APP_FRONTEND_URL=http://localhost:5173  # For QR code links
+
+# AWS S3 Configuration
+AWS_S3_BUCKET_NAME=your-bucket-name
+AWS_S3_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your-access-key
+AWS_SECRET_ACCESS_KEY=your-secret-key
 ```
 
 ## Testing

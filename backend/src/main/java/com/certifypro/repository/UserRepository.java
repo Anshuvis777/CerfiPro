@@ -24,6 +24,8 @@ public interface UserRepository extends JpaRepository<User, UUID> {
 
     List<User> findByRole(UserRole role);
 
+    Long countByRole(UserRole role);
+
     @Query("SELECT u FROM User u JOIN u.skills s WHERE s.name IN :skillNames")
     List<User> findBySkillsIn(@Param("skillNames") List<String> skillNames);
 

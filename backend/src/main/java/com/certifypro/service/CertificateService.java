@@ -13,8 +13,7 @@ import com.certifypro.repository.CertificateRepository;
 import com.certifypro.repository.SkillRepository;
 import com.certifypro.repository.UserRepository;
 import com.certifypro.util.BlockchainUtil;
-import com.certifypro.util.QRCodeGenerator;
-import com.google.zxing.WriterException;
+import com.certifypro.service.QRCodeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,7 +32,7 @@ public class CertificateService {
     private final CertificateRepository certificateRepository;
     private final UserRepository userRepository;
     private final SkillRepository skillRepository;
-    private final QRCodeGenerator qrCodeGenerator;
+    private final QRCodeService qrCodeService;
     private final BlockchainUtil blockchainUtil;
 
     @Transactional
@@ -49,6 +48,10 @@ public class CertificateService {
         // Get or create skills
         Set<Skill> skills = getOrCreateSkills(request.getSkills());
 
+        // Generate verification ID and QR code
+        String verificationId = qrCodeService.generateVerificationId();
+        String qrCode = qrCodeService.generateQRCodeBase64(verificationId);
+
         // Create certificate
         Certificate certificate = Certificate.builder()
                 .name(request.getName())
@@ -60,6 +63,8 @@ public class CertificateService {
                 .issuer(issuer)
                 .skills(skills)
                 .views(0)
+                .verificationId(verificationId)
+                .qrCode(qrCode)
                 .build();
 
         certificate = certificateRepository.save(certificate);
@@ -71,16 +76,6 @@ public class CertificateService {
                 issuer.getEmail(),
                 certificate.getName());
         certificate.setBlockchainHash(blockchainHash);
-
-        // Generate QR code
-        try {
-            String qrCodeData = "https://certifypro.com/verify/" + certificate.getId();
-            String qrCode = qrCodeGenerator.generateQRCodeBase64(qrCodeData);
-            certificate.setQrCode(qrCode);
-        } catch (WriterException | IOException e) {
-            // Log error but don't fail the certificate creation
-            System.err.println("Failed to generate QR code: " + e.getMessage());
-        }
 
         certificate = certificateRepository.save(certificate);
 
@@ -161,6 +156,29 @@ public class CertificateService {
         return convertToCertificateResponse(certificate);
     }
 
+    @Transactional(readOnly = true)
+    public CertificateResponse verifyCertificateByVerificationId(String verificationId) {
+        Certificate certificate = certificateRepository.findByVerificationId(verificationId)
+                .orElseThrow(() -> new ResourceNotFoundException("Certificate not found or invalid ID"));
+
+        // Increment view count
+        certificate.incrementViews();
+        certificateRepository.save(certificate);
+
+        // Verify blockchain hash
+        if (!blockchainUtil.verifyBlockchainHash(certificate.getBlockchainHash())) {
+            throw new BadRequestException("Certificate verification failed - invalid blockchain hash");
+        }
+
+        // Check if expired
+        if (certificate.isExpired()) {
+            certificate.setStatus(CertificateStatus.EXPIRED);
+            certificateRepository.save(certificate);
+        }
+
+        return convertToCertificateResponse(certificate);
+    }
+
     private Set<Skill> getOrCreateSkills(Set<String> skillNames) {
         Set<Skill> skills = new HashSet<>();
         for (String skillName : skillNames) {
@@ -187,6 +205,7 @@ public class CertificateService {
                 .status(certificate.getStatus())
                 .blockchainHash(certificate.getBlockchainHash())
                 .qrCode(certificate.getQrCode())
+                .verificationId(certificate.getVerificationId())
                 .views(certificate.getViews())
                 .holderName(certificate.getHolder().getUsername())
                 .holderUsername(certificate.getHolder().getUsername())

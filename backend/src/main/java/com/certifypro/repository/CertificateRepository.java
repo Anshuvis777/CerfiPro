@@ -18,43 +18,45 @@ import java.util.UUID;
 @Repository
 public interface CertificateRepository extends JpaRepository<Certificate, UUID> {
 
-    List<Certificate> findByHolder(User holder);
+        List<Certificate> findByHolder(User holder);
 
-    List<Certificate> findByIssuer(User issuer);
+        List<Certificate> findByIssuer(User issuer);
 
-    Page<Certificate> findByHolder(User holder, Pageable pageable);
+        Page<Certificate> findByHolder(User holder, Pageable pageable);
 
-    Page<Certificate> findByIssuer(User issuer, Pageable pageable);
+        Page<Certificate> findByIssuer(User issuer, Pageable pageable);
 
-    List<Certificate> findByStatus(CertificateStatus status);
+        List<Certificate> findByStatus(CertificateStatus status);
 
-    Optional<Certificate> findByBlockchainHash(String blockchainHash);
+        Optional<Certificate> findByBlockchainHash(String blockchainHash);
 
-    @Query("SELECT c FROM Certificate c WHERE c.holder = :holder AND c.status = :status")
-    List<Certificate> findByHolderAndStatus(@Param("holder") User holder,
-            @Param("status") CertificateStatus status);
+        Optional<Certificate> findByVerificationId(String verificationId);
 
-    @Query("SELECT c FROM Certificate c WHERE c.issuer = :issuer AND c.status = :status")
-    List<Certificate> findByIssuerAndStatus(@Param("issuer") User issuer,
-            @Param("status") CertificateStatus status);
+        @Query("SELECT c FROM Certificate c WHERE c.holder = :holder AND c.status = :status")
+        List<Certificate> findByHolderAndStatus(@Param("holder") User holder,
+                        @Param("status") CertificateStatus status);
 
-    @Query("SELECT c FROM Certificate c JOIN c.skills s WHERE s.name IN :skillNames")
-    List<Certificate> findBySkillsIn(@Param("skillNames") List<String> skillNames);
+        @Query("SELECT c FROM Certificate c WHERE c.issuer = :issuer AND c.status = :status")
+        List<Certificate> findByIssuerAndStatus(@Param("issuer") User issuer,
+                        @Param("status") CertificateStatus status);
 
-    @Query("SELECT c FROM Certificate c WHERE c.expiryDate BETWEEN :startDate AND :endDate")
-    List<Certificate> findExpiringBetween(@Param("startDate") LocalDate startDate,
-            @Param("endDate") LocalDate endDate);
+        @Query("SELECT c FROM Certificate c JOIN c.skills s WHERE s.name IN :skillNames")
+        List<Certificate> findBySkillsIn(@Param("skillNames") List<String> skillNames);
 
-    @Query("SELECT c FROM Certificate c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))")
-    List<Certificate> searchByName(@Param("query") String query);
+        @Query("SELECT c FROM Certificate c WHERE c.expiryDate BETWEEN :startDate AND :endDate")
+        List<Certificate> findExpiringBetween(@Param("startDate") LocalDate startDate,
+                        @Param("endDate") LocalDate endDate);
 
-    @Query("SELECT COUNT(c) FROM Certificate c WHERE c.issuer = :issuer")
-    Long countByIssuer(@Param("issuer") User issuer);
+        @Query("SELECT c FROM Certificate c WHERE LOWER(c.name) LIKE LOWER(CONCAT('%', :query, '%'))")
+        List<Certificate> searchByName(@Param("query") String query);
 
-    @Query("SELECT COUNT(c) FROM Certificate c WHERE c.holder = :holder")
-    Long countByHolder(@Param("holder") User holder);
+        @Query("SELECT COUNT(c) FROM Certificate c WHERE c.issuer = :issuer")
+        Long countByIssuer(@Param("issuer") User issuer);
 
-    @Query("SELECT COUNT(c) FROM Certificate c WHERE c.issuer = :issuer AND c.createdAt >= :startDate")
-    Long countByIssuerAndCreatedAtAfter(@Param("issuer") User issuer,
-            @Param("startDate") java.time.LocalDateTime startDate);
+        @Query("SELECT COUNT(c) FROM Certificate c WHERE c.holder = :holder")
+        Long countByHolder(@Param("holder") User holder);
+
+        @Query("SELECT COUNT(c) FROM Certificate c WHERE c.issuer = :issuer AND c.createdAt >= :startDate")
+        Long countByIssuerAndCreatedAtAfter(@Param("issuer") User issuer,
+                        @Param("startDate") java.time.LocalDateTime startDate);
 }

@@ -14,6 +14,7 @@ import EmployerDashboard from './pages/employer/EmployerDashboard';
 import CertificatePage from './pages/CertificatePage';
 import VerificationPage from './pages/VerificationPage';
 import AdminPanel from './pages/admin/AdminPanel';
+import VerifyCertificatePage from './pages/VerifyCertificatePage';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
@@ -31,37 +32,38 @@ function App() {
                   <Route path="/profile/:username" element={<ProfilePage />} />
                   <Route path="/cert/:certId" element={<CertificatePage />} />
                   <Route path="/verify" element={<VerificationPage />} />
-                  <Route 
-                    path="/dashboard" 
+                  <Route path="/verify/:verificationId" element={<VerifyCertificatePage />} />
+                  <Route
+                    path="/dashboard"
                     element={
                       <ProtectedRoute requiredRole="individual">
                         <IndividualDashboard />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
-                  <Route 
-                    path="/issuer/dashboard" 
+                  <Route
+                    path="/issuer/dashboard"
                     element={
                       <ProtectedRoute requiredRole="issuer">
                         <IssuerDashboard />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
-                  <Route 
-                    path="/employer/dashboard" 
+                  <Route
+                    path="/employer/dashboard"
                     element={
                       <ProtectedRoute requiredRole="employer">
                         <EmployerDashboard />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
-                  <Route 
-                    path="/admin" 
+                  <Route
+                    path="/admin"
                     element={
                       <ProtectedRoute requiredRole="admin">
                         <AdminPanel />
                       </ProtectedRoute>
-                    } 
+                    }
                   />
                 </Route>
               </Routes>

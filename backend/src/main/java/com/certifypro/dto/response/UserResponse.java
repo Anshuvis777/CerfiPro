@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -26,4 +27,5 @@ public class UserResponse {
     private String location;
     private String experience;
     private ProfileVisibility profileVisibility;
+    private LocalDateTime createdAt;
 }

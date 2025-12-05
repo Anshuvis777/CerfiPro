@@ -59,6 +59,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/verify/**").permitAll()
                         .requestMatchers("/api/users/{username}").permitAll()
                         .requestMatchers("/api/certificates/{id}").permitAll()
+                        .requestMatchers("/api/certificates/verify/**").permitAll()
 
                         // Swagger/OpenAPI
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()

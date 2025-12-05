@@ -48,6 +48,9 @@ public class Certificate {
     @Column(name = "qr_code", columnDefinition = "TEXT")
     private String qrCode;
 
+    @Column(name = "verification_id", unique = true, nullable = false)
+    private String verificationId; // Unique ID for public verification
+
     @Column(nullable = false)
     @Builder.Default
     private Integer views = 0;

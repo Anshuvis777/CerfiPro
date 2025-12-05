@@ -64,4 +64,11 @@ public class CertificateController {
         certificateService.revokeCertificate(id, issuerUsername);
         return ResponseEntity.ok(ApiResponse.success("Certificate revoked successfully", null));
     }
+
+    @GetMapping("/verify/{verificationId}")
+    public ResponseEntity<ApiResponse<CertificateResponse>> verifyCertificate(
+            @PathVariable String verificationId) {
+        CertificateResponse certificate = certificateService.verifyCertificateByVerificationId(verificationId);
+        return ResponseEntity.ok(ApiResponse.success("Certificate verified successfully", certificate));
+    }
 }

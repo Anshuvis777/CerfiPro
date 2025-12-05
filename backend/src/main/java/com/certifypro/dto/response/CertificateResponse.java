@@ -23,6 +23,7 @@ public class CertificateResponse {
     private CertificateStatus status;
     private String blockchainHash;
     private String qrCode;
+    private String verificationId;
     private Integer views;
     private String holderName;
     private String holderUsername;
