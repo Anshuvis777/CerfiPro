@@ -27,18 +27,28 @@ public class DataSourceConfig {
     public DataSource dataSource() {
         if (dbUrl != null && dbUrl.startsWith("postgres://")) {
             try {
-                URI uri = new URI(dbUrl);
-                String username = uri.getUserInfo().split(":")[0];
-                String password = uri.getUserInfo().split(":")[1];
-                String jdbcUrl = "jdbc:postgresql://" + uri.getHost() + ":" + uri.getPort() + uri.getPath();
+                // Manual parsing to avoid URI issues with special chars in password
+                String noProtocol = dbUrl.substring("postgres://".length());
+                int atIndex = noProtocol.lastIndexOf('@');
 
-                HikariDataSource dataSource = new HikariDataSource();
-                dataSource.setJdbcUrl(jdbcUrl);
-                dataSource.setUsername(username);
-                dataSource.setPassword(password);
-                return dataSource;
-            } catch (URISyntaxException e) {
-                throw new RuntimeException("Invalid DATABASE_URL format", e);
+                if (atIndex != -1) {
+                    String userPass = noProtocol.substring(0, atIndex);
+                    String hostPortDb = noProtocol.substring(atIndex + 1);
+
+                    String[] creds = userPass.split(":");
+                    String username = creds[0];
+                    String password = creds.length > 1 ? creds[1] : "";
+
+                    String jdbcUrl = "jdbc:postgresql://" + hostPortDb;
+
+                    HikariDataSource dataSource = new HikariDataSource();
+                    dataSource.setJdbcUrl(jdbcUrl);
+                    dataSource.setUsername(username);
+                    dataSource.setPassword(password);
+                    return dataSource;
+                }
+            } catch (Exception e) {
+                throw new RuntimeException("Error parsing DATABASE_URL", e);
             }
         }
 
