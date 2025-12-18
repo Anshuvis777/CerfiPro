@@ -25,31 +25,36 @@ public class DataInitializer {
     @Profile("dev")
     public CommandLineRunner initData() {
         return args -> {
+            // Pre-create all skills first to avoid detached entity issues
+            Skill management = createAndSaveSkill("Management");
+            Skill security = createAndSaveSkill("Security");
+            Skill education = createAndSaveSkill("Education");
+            Skill training = createAndSaveSkill("Training");
+            Skill react = createAndSaveSkill("React");
+            Skill typescript = createAndSaveSkill("TypeScript");
+            Skill nodejs = createAndSaveSkill("Node.js");
+            Skill recruitment = createAndSaveSkill("Recruitment");
+            Skill screening = createAndSaveSkill("Technical Screening");
+
             // Create admin user
             if (!userRepository.existsByEmail("admin@certifypro.com")) {
-                Set<Skill> adminSkills = new HashSet<>();
-                adminSkills.add(createSkill("Management"));
-                adminSkills.add(createSkill("Security"));
-
                 User admin = User.builder()
                         .email("admin@certifypro.com")
                         .username("admin")
                         .password(passwordEncoder.encode("password123"))
                         .role(UserRole.ADMIN)
                         .bio("Platform Administrator")
-                        .skills(adminSkills)
+                        .skills(new HashSet<>())
                         .enabled(true)
                         .build();
+                admin.getSkills().add(management);
+                admin.getSkills().add(security);
                 userRepository.save(admin);
                 System.out.println("Created admin user: admin@certifypro.com / password123");
             }
 
             // Create issuer user
             if (!userRepository.existsByEmail("issuer@certifypro.com")) {
-                Set<Skill> issuerSkills = new HashSet<>();
-                issuerSkills.add(createSkill("Education"));
-                issuerSkills.add(createSkill("Training"));
-
                 User issuer = User.builder()
                         .email("issuer@certifypro.com")
                         .username("issuer")
@@ -57,20 +62,17 @@ public class DataInitializer {
                         .role(UserRole.ISSUER)
                         .bio("Leading technology training institute")
                         .organization("TechCorp Academy")
-                        .skills(issuerSkills)
+                        .skills(new HashSet<>())
                         .enabled(true)
                         .build();
+                issuer.getSkills().add(education);
+                issuer.getSkills().add(training);
                 userRepository.save(issuer);
                 System.out.println("Created issuer user: issuer@certifypro.com / password123");
             }
 
             // Create individual user
             if (!userRepository.existsByEmail("john@example.com")) {
-                Set<Skill> individualSkills = new HashSet<>();
-                individualSkills.add(createSkill("React"));
-                individualSkills.add(createSkill("TypeScript"));
-                individualSkills.add(createSkill("Node.js"));
-
                 User individual = User.builder()
                         .email("john@example.com")
                         .username("johndoe")
@@ -79,20 +81,19 @@ public class DataInitializer {
                         .bio("Software Developer passionate about blockchain technology")
                         .location("San Francisco, CA")
                         .experience("5 years")
-                        .skills(individualSkills)
+                        .skills(new HashSet<>())
                         .profileVisibility(ProfileVisibility.PUBLIC)
                         .enabled(true)
                         .build();
+                individual.getSkills().add(react);
+                individual.getSkills().add(typescript);
+                individual.getSkills().add(nodejs);
                 userRepository.save(individual);
                 System.out.println("Created individual user: john@example.com / password123");
             }
 
             // Create employer user
             if (!userRepository.existsByEmail("recruiter@techcorp.com")) {
-                Set<Skill> employerSkills = new HashSet<>();
-                employerSkills.add(createSkill("Recruitment"));
-                employerSkills.add(createSkill("Technical Screening"));
-
                 User employer = User.builder()
                         .email("recruiter@techcorp.com")
                         .username("sarah_recruiter")
@@ -101,9 +102,11 @@ public class DataInitializer {
                         .bio("Senior Technical Recruiter at TechCorp")
                         .organization("TechCorp Inc.")
                         .location("New York, NY")
-                        .skills(employerSkills)
+                        .skills(new HashSet<>())
                         .enabled(true)
                         .build();
+                employer.getSkills().add(recruitment);
+                employer.getSkills().add(screening);
                 userRepository.save(employer);
                 System.out.println("Created employer user: recruiter@techcorp.com / password123");
             }
@@ -112,7 +115,7 @@ public class DataInitializer {
         };
     }
 
-    private Skill createSkill(String name) {
+    private Skill createAndSaveSkill(String name) {
         return skillRepository.findByName(name)
                 .orElseGet(() -> skillRepository.save(
                         Skill.builder()

@@ -53,10 +53,27 @@ CertifyPro is a comprehensive platform for issuing, managing, and verifying digi
 *   Maven 3.6+
 *   PostgreSQL 14+ (optional for dev)
 
+### Project Structure
+
+The project is organized into two main directories:
+
+```
+project/
+├── frontend/        # React + TypeScript application
+│   ├── src/
+│   ├── package.json
+│   └── README.md
+├── backend/         # Spring Boot API
+│   ├── src/
+│   ├── pom.xml
+│   └── README.md
+└── README.md        # This file
+```
+
 ### 1. Clone the repository
 ```bash
 git clone <repository-url>
-cd certifypro
+cd project
 ```
 
 ### 2. Backend Setup
@@ -79,10 +96,12 @@ mvn spring-boot:run
 ```
 The backend will start on `http://localhost:8080`.
 
+**For detailed backend setup**, see [backend/README.md](backend/README.md) or [backend/SETUP_GUIDE.md](backend/SETUP_GUIDE.md)
+
 ### 3. Frontend Setup
-Navigate to the project root (if not already there):
+Navigate to the frontend directory:
 ```bash
-cd ..
+cd ../frontend
 ```
 
 **Run the Frontend**:
@@ -91,6 +110,8 @@ npm install
 npm run dev
 ```
 The frontend will start on `http://localhost:5173`.
+
+**For detailed frontend setup**, see [frontend/README.md](frontend/README.md)
 
 ## 🔑 Default Test Users (Dev Mode)
 
