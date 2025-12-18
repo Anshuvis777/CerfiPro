@@ -3,19 +3,14 @@ spring:
     name: certifypro-backend
   
   datasource:
-    url: jdbc:h2:mem:certifypro
-    driverClassName: org.h2.Driver
-    username: sa
-    password: password
+    url: ${DATABASE_URL} 
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
   
   jpa:
-    database-platform: org.hibernate.dialect.H2Dialect
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
-      ddl-auto: update
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
+      ddl-auto: update  
   
   h2:
     console:
@@ -43,6 +38,20 @@ spring.servlet.multipart:
   max-file-size: 10MB
   max-request-size: 10MB
 
+# AWS S3 Configuration
+aws:
+  s3:
+    bucket-name: ${AWS_S3_BUCKET_NAME:profile-pic-bucket-for-certifypro}
+    region: ${AWS_S3_REGION:ap-southeast-2}
+    access-key: ${AWS_ACCESS_KEY_ID}
+    secret-key: ${AWS_SECRET_ACCESS_KEY}
+
+# File Upload Settings
+file:
+  upload:
+    max-size: 5242880 # 5MB in bytes
+    allowed-types: image/jpeg,image/png,image/webp
+
 # Server Configuration
 server:
   port: 8080
@@ -52,7 +61,7 @@ server:
 
 # CORS Configuration
 cors:
-  allowed-origins: http://localhost:5173,http://localhost:3000
+  allowed-origins: ${APP_FRONTEND_URL:http://localhost:5173},http://localhost:3000
   allowed-methods: GET,POST,PUT,DELETE,OPTIONS
   allowed-headers: "*"
   allow-credentials: true
