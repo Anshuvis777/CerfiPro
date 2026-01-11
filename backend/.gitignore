@@ -1,0 +1,86 @@
+# ====================
+# BACKEND GITIGNORE
+# ====================
+
+# Maven build files
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Gradle build files (if using Gradle)
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDE files
+.idea/
+*.iws
+*.iml
+*.ipr
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+*~.nib
+*~
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Environment variables & secrets
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Application properties with sensitive data
+application-prod.yml
+application-prod.properties
+application-local.yml
+application-local.properties
+application-secret.yml
+application-secret.properties
+
+# Database files (H2)
+*.db
+*.mv.db
+*.trace.db
+
+# Test coverage
+*.exec
+.sonar/
+
+# Generated files
+generated/
+*.class
+*.jar
+!.mvn/wrapper/*.jar
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+hs_err_pid*
+replay_pid*
